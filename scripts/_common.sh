@@ -3,23 +3,6 @@
 set -euo pipefail
 shopt -s inherit_errexit
 
-DEFAULT_HARNESS=claude
-DEFAULT_HERDR_SESSION=tmux-herdr
-
-# Herdr:
-#   - workspace <-> project
-#   - tab <-> repository
-#   - pane <-> branch / worktree
-#
-# Tmux:
-#   - session <-> proj::repo (proj is repo/..)
-#
-# Commands:
-#   - [new] -> get proj+repo -> choose branch (default local) -> create worktree (if branch != local) -> start agent -> open Herdr
-#   - [local-open] -> get proj+repo -> open Herdr
-#   - [open] -> open Herdr (previously open session)
-#   - [attach] -> get proj+repo -> choose pane (if multiple) -> open harness in tmux pane
-#   - when tmux session is closed -> close relevant Herdr tabs
 
 function _herdr_interactive() {
     HERDR_SESSION="$DEFAULT_HERDR_SESSION" herdr "$@"
@@ -132,7 +115,7 @@ function cleanup_extra_panes() {
 }
 
 function start_agent() {
-    local -r ws_id="$1" name="$2" repo_path="$3"
+    local -r ws_id="$1" name="$2" repo_path="$3" harness="$4"
 
     local pane_id
     pane_id=$(_herdr agent list |
@@ -150,7 +133,7 @@ function start_agent() {
         if [[ $cwd == "null" ]]; then
             cwd="$repo_path"
         fi
-        pane_id=$(_herdr agent start "$name" --workspace "$ws_id" --cwd "$cwd" -- $DEFAULT_HARNESS |
+        pane_id=$(_herdr agent start "$name" --workspace "$ws_id" --cwd "$cwd" -- "$harness" |
             jq --raw-output '.result.agent.pane_id')
 
         cleanup_extra_panes "$ws_id" "$pane_id"
@@ -173,6 +156,8 @@ function select_agent() {
 }
 
 function new_agent() {
+    local -r harness="$1"
+
     local repo_full_path repo_name project_name branch_name
     get_repo_metadata repo_full_path repo_name project_name
     branch_name=$(select_branch)
@@ -184,7 +169,7 @@ function new_agent() {
     ws_id=$(create_workspace "$workspace_name" "$repo_full_path")
     wt_id=$(create_worktree "$ws_id" "$branch_name" "$repo_full_path")
 
-    start_agent "$wt_id" "$agent_name" "$repo_full_path"
+    start_agent "$wt_id" "$agent_name" "$repo_full_path" "$harness"
 
     _herdr agent focus "$agent_name" >/dev/null
 }
