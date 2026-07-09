@@ -41,6 +41,9 @@ attach_agent)
 new_agent)
     new_agent "$@"
     ;;
+agents_status)
+    "$CURRENT_DIR/scripts/agents_status.sh" "$@"
+    ;;
 *)
     exit 1
     ;;
