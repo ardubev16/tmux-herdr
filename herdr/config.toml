@@ -1,0 +1,7 @@
+onboarding = false
+
+[theme]
+name = "terminal"
+
+[keys]
+detach = ["ctrl+c", "ctrl+d"]

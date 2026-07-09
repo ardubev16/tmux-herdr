@@ -3,9 +3,12 @@
 set -euo pipefail
 shopt -s inherit_errexit
 
+CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 function _herdr_interactive() {
-    HERDR_SESSION="$DEFAULT_HERDR_SESSION" herdr "$@"
+    HERDR_SESSION=tmux-herdr \
+        HERDR_CONFIG_PATH="$CURRENT_DIR/../herdr/config.toml" \
+        herdr "$@"
 }
 
 function _herdr() {
