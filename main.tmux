@@ -6,17 +6,30 @@ CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 declare -r herdr_status_placeholder='\#{tmux_herdr_status}'
 
+declare -r harness_config='@tmux_herdr_harness'
+declare -r split_direction_config='@tmux_herdr_split_direction'
+
 declare -r background_config='@tmux_herdr_status_background'
 declare -r idle_foreground_config='@tmux_herdr_status_idle_foreground'
 declare -r working_foreground_config='@tmux_herdr_status_working_foreground'
 declare -r blocked_foreground_config='@tmux_herdr_status_blocked_foreground'
 
-declare -r harness_config='@tmux_herdr_harness'
-
 function tmux_option() {
     local -r option=$(tmux show-option -gqv "$1")
     local -r fallback="$2"
     echo "${option:-$fallback}"
+}
+
+function init_tmux_herdr() {
+    local -r \
+        harness=$(tmux_option "$harness_config" "claude") \
+        split_direction=$(tmux_option "$split_direction_config" "h")
+
+    tmux bind-key h run-shell "$CURRENT_DIR/main.sh agent_dashboard"
+    tmux bind-key a run-shell "$CURRENT_DIR/main.sh attach_agent"
+    tmux bind-key N run-shell "$CURRENT_DIR/main.sh new_agent \"$harness\" \"$split_direction\""
+
+    "$CURRENT_DIR/main.sh" init
 }
 
 function init_tmux_herdr_status() {
@@ -35,14 +48,5 @@ function init_tmux_herdr_status() {
     tmux set-option -gq "status-right" "${status_right_value/$herdr_status_placeholder/$herdr_status}"
 }
 
-function init_tmux_herdr() {
-    local -r \
-        harness=$(tmux_option "$harness_config" "claude")
-
-    tmux bind-key h run-shell "$CURRENT_DIR/main.sh agent_dashboard"
-    tmux bind-key a run-shell "$CURRENT_DIR/main.sh attach_agent"
-    tmux bind-key N run-shell "$CURRENT_DIR/main.sh new_agent \"$harness\""
-}
-
-init_tmux_herdr_status
 init_tmux_herdr
+init_tmux_herdr_status

@@ -19,9 +19,37 @@ function attach_agent() {
     tmux split-window -h "$CURRENT_DIR/scripts/attach_agent.sh"
 }
 
+function shell_basename() {
+    basename "$(tmux show-option -gqv default-shell)"
+}
+
+function find_shell_pane() {
+    local -r default_shell="$1"
+    tmux list-panes -F '#{pane_id} #{pane_current_command}' |
+        awk -v shell="$default_shell" '$2 == shell { print $1; exit }'
+}
+
 function new_agent() {
-    true
-    # TODO: Implement
+    local -r harness="$1" split_direction="$2"
+    local -r default_shell="$(shell_basename)"
+
+    local focused_pane focused_command
+    read -r focused_pane focused_command <<<"$(tmux display-message -p '#{pane_id} #{pane_current_command}')"
+
+    local target_pane
+    if [[ "$focused_command" == "$default_shell" ]]; then
+        target_pane="$focused_pane"
+    else
+        target_pane=$(find_shell_pane "$default_shell")
+    fi
+
+    if [[ -n "$target_pane" ]]; then
+        tmux select-pane -t "$target_pane"
+        tmux send-keys -t "$target_pane" "$CURRENT_DIR/scripts/new_agent.sh '$harness'" Enter
+    else
+        local -r pane_path="$(tmux display-message -p -t "$target_pane" '#{pane_current_path}')"
+        tmux split-window -c "$pane_path" "-$split_direction" "$CURRENT_DIR/scripts/new_agent.sh" "$harness"
+    fi
 }
 
 if [[ $# -lt 1 ]]; then
@@ -32,6 +60,11 @@ command="$1"
 shift
 
 case "$command" in
+init)
+    # TODO: Add command to start session if not already running.
+    # TODO: Check minimum supported version.
+    exit 0
+    ;;
 agent_dashboard)
     agent_dashboard "$@"
     ;;
@@ -39,6 +72,9 @@ attach_agent)
     attach_agent "$@"
     ;;
 new_agent)
+    # TODO: Two keybindings for start and attach:
+    # 1. leader+B -> fzf branches -> agent
+    # 2. leader+N -> agent with current branch
     new_agent "$@"
     ;;
 agents_status)

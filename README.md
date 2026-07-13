@@ -30,12 +30,11 @@ It renders three colored counters, one per agent state:
 
 All keybindings are triggered with your tmux prefix:
 
-| Key          | Action                                                                                             |
-| ------------ | -------------------------------------------------------------------------------------------------- |
-| `prefix + h` | Open the herdr dashboard in a popup                                                                |
-| `prefix + a` | Attach to the agent for the current repo in a new pane (prompts with fzf if multiple agents match) |
-
-<!-- TODO:   | `prefix + N`                                                                                       | Start a new agent: pick a branch with fzf, create/reuse its workspace and worktree, launch the agent, and focus it | -->
+| Key          | Action                                                                                                                                                               |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `prefix + h` | Open the herdr dashboard in a popup                                                                                                                                  |
+| `prefix + a` | Attach to the agent for the current repo in a new pane (prompts with fzf if multiple agents match)                                                                   |
+| `prefix + N` | Start a new agent: pick a branch with fzf, create/reuse its workspace and worktree, and attach to it (reusing a shell pane if one is available, otherwise splitting) |
 
 ## Installation
 
@@ -84,4 +83,8 @@ set -g @tmux_herdr_status_working_foreground 'yellow'
 
 # Foreground color for blocked agents
 set -g @tmux_herdr_status_blocked_foreground 'red'
+
+# Direction of the split used to place a new agent's pane, when no existing
+# shell pane is available to reuse ('h' for horizontal, 'v' for vertical)
+set -g @tmux_herdr_split_direction 'h'
 ```

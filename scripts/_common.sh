@@ -175,4 +175,6 @@ function new_agent() {
     start_agent "$wt_id" "$agent_name" "$repo_full_path" "$harness"
 
     _herdr agent focus "$agent_name" >/dev/null
+
+    echo "$agent_name"
 }
