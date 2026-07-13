@@ -30,11 +30,12 @@ It renders three colored counters, one per agent state:
 
 All keybindings are triggered with your tmux prefix:
 
-| Key          | Action                                                                                                                                                               |
-| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `prefix + h` | Open the herdr dashboard in a popup                                                                                                                                  |
-| `prefix + a` | Attach to the agent for the current repo in a new pane (prompts with fzf if multiple agents match)                                                                   |
-| `prefix + N` | Start a new agent: pick a branch with fzf, create/reuse its workspace and worktree, and attach to it (reusing a shell pane if one is available, otherwise splitting) |
+| Key          | Action                                                                                                                                                                              |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `prefix + h` | Open the herdr dashboard in a popup                                                                                                                                                |
+| `prefix + a` | Attach to the agent for the current repo in a new pane (prompts with fzf if multiple agents match)                                                                                |
+| `prefix + N` | Start a new agent for the branch currently checked out, create/reuse its workspace and worktree, and attach to it (reusing a shell pane if one is available, otherwise splitting) |
+| `prefix + B` | Same as above, but first pick a branch with fzf in a popup                                                                                                                         |
 
 ## Installation
 
@@ -87,4 +88,16 @@ set -g @tmux_herdr_status_blocked_foreground 'red'
 # Direction of the split used to place a new agent's pane, when no existing
 # shell pane is available to reuse ('h' for horizontal, 'v' for vertical)
 set -g @tmux_herdr_split_direction 'h'
+
+# Key that opens the herdr dashboard
+set -g @tmux_herdr_key_dashboard 'h'
+
+# Key that attaches to the agent for the current repo
+set -g @tmux_herdr_key_attach 'a'
+
+# Key that starts a new agent for the branch currently checked out
+set -g @tmux_herdr_key_new_agent 'N'
+
+# Key that starts a new agent, picking the branch with fzf in a popup
+set -g @tmux_herdr_key_new_agent_branch 'B'
 ```

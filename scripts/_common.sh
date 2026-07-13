@@ -159,11 +159,10 @@ function select_agent() {
 }
 
 function new_agent() {
-    local -r harness="$1"
+    local -r harness="$1" branch_name="$2"
 
-    local repo_full_path repo_name project_name branch_name
+    local repo_full_path repo_name project_name
     get_repo_metadata repo_full_path repo_name project_name
-    branch_name=$(select_branch)
 
     local -r workspace_name="${project_name}::${repo_name}"
     local -r agent_name="${workspace_name}::${branch_name}"

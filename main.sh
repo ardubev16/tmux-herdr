@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -eou pipefail
+set -euo pipefail
 
 CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
@@ -29,8 +29,8 @@ function find_shell_pane() {
         awk -v shell="$default_shell" '$2 == shell { print $1; exit }'
 }
 
-function new_agent() {
-    local -r harness="$1" split_direction="$2"
+function _spawn_new_agent() {
+    local -r harness="$1" split_direction="$2" branch_name="$3"
     local -r default_shell="$(shell_basename)"
 
     local focused_pane focused_command
@@ -45,10 +45,10 @@ function new_agent() {
 
     if [[ -n "$target_pane" ]]; then
         tmux select-pane -t "$target_pane"
-        tmux send-keys -t "$target_pane" "$CURRENT_DIR/scripts/new_agent.sh '$harness'" Enter
+        tmux send-keys -t "$target_pane" "$CURRENT_DIR/scripts/new_agent.sh '$harness' '$branch_name'" Enter
     else
-        local -r pane_path="$(tmux display-message -p -t "$target_pane" '#{pane_current_path}')"
-        tmux split-window -c "$pane_path" "-$split_direction" "$CURRENT_DIR/scripts/new_agent.sh" "$harness"
+        local -r pane_path="$(tmux display-message -p -t "$focused_pane" '#{pane_current_path}')"
+        tmux split-window -c "$pane_path" "-$split_direction" "$CURRENT_DIR/scripts/new_agent.sh" "$harness" "$branch_name"
     fi
 }
 
