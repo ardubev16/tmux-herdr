@@ -49,7 +49,7 @@ function init_tmux_herdr_status() {
         working_foreground=$(tmux_option "$working_foreground_config" "yellow") \
         blocked_foreground=$(tmux_option "$blocked_foreground_config" "red")
 
-    local -r herdr_status="#[default]#[bg=$background]#(\"$CURRENT_DIR/main.sh\" agents_status \"$idle_foreground\" \"$working_foreground\" \"$blocked_foreground\")#[default]"
+    local -r herdr_status="#[default]#[bg=$background]#(\"$CURRENT_DIR/scripts/status_bar.sh\" \"$idle_foreground\" \"$working_foreground\" \"$blocked_foreground\")#[default]"
 
     local -r status_left_value="$(tmux_option "status-left")"
     tmux set-option -gq "status-left" "${status_left_value/$herdr_status_placeholder/$herdr_status}"

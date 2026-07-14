@@ -2,11 +2,11 @@
 
 set -euo pipefail
 
-CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/scripts/_common.sh"
 
 function agent_dashboard() {
     # TODO: implement toggle
-    tmux display-popup -w 90% -h 90% -E "$CURRENT_DIR/scripts/agent_dashboard.sh"
+    tmux display-popup -w 90% -h 90% -E "$SCRIPTS_DIR/agent_dashboard.sh"
 }
 
 function attach_agent() {
@@ -16,7 +16,7 @@ function attach_agent() {
     #   - horizontal split
     #   - vertical split
     #   - use focused pane
-    tmux split-window -h "$CURRENT_DIR/scripts/attach_agent.sh"
+    tmux split-window -h "$SCRIPTS_DIR/attach_agent.sh"
 }
 
 function shell_basename() {
@@ -72,8 +72,6 @@ new_agent)
     # 2. leader+N -> agent with current branch
     new_agent "$@"
     ;;
-agents_status)
-    "$CURRENT_DIR/scripts/agents_status.sh" "$@"
     ;;
 *)
     exit 1

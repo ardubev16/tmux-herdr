@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
-CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-. "$CURRENT_DIR/_common.sh"
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/_common.sh"
 
 MINIMUM_HERDR_VERSION="0.7.1"
 

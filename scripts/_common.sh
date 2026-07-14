@@ -3,12 +3,13 @@
 set -euo pipefail
 shopt -s inherit_errexit
 
-HERDR_SESSION=tmux-herdr
-CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+declare -r HERDR_SESSION_NAME=tmux-herdr
+declare SCRIPTS_DIR
+SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 function _herdr_interactive() {
-    HERDR_SESSION="$HERDR_SESSION" \
-        HERDR_CONFIG_PATH="$CURRENT_DIR/../herdr/config.toml" \
+    HERDR_SESSION="$HERDR_SESSION_NAME" \
+        HERDR_CONFIG_PATH="$SCRIPTS_DIR/../herdr/config.toml" \
         herdr "$@"
 }
 
@@ -28,7 +29,7 @@ function wait_for_herdr_server() {
     while [[ $session_running != "true" && $retries -lt $max_retries ]]; do
         session_running=$(_herdr session list --json |
             jq --raw-output \
-                --arg name "$HERDR_SESSION" \
+                --arg name "$HERDR_SESSION_NAME" \
                 '.sessions | map(select(.name == $name).running) | .[]')
         retries=$((retries + 1))
         sleep 0.1
@@ -41,10 +42,11 @@ function wait_for_herdr_server() {
 
 function get_repo_metadata() {
     local -n _repo_full_path="$1" _repo_name="$2" _project_name="$3"
+    local -r _path="${4:-.}"
 
     local _git_dir
-    _git_dir=$(git rev-parse --absolute-git-dir 2>/dev/null) || {
-        echo "Not a git repo."
+    _git_dir=$(git -C "$_path" rev-parse --absolute-git-dir 2>/dev/null) || {
+        echo "Not a git repo." >&2
         return 1
     }
 
@@ -177,13 +179,18 @@ function select_agent() {
     fi
 }
 
+function repo_prefix() {
+    local -r project_name="$1" repo_name="$2"
+    echo "${project_name}::${repo_name}"
+}
+
 function new_agent() {
     local -r harness="$1" branch_name="$2"
 
     local repo_full_path repo_name project_name
     get_repo_metadata repo_full_path repo_name project_name
 
-    local -r workspace_name="${project_name}::${repo_name}"
+    local -r workspace_name="$(repo_prefix "$project_name" "$repo_name")"
     local -r agent_name="${workspace_name}::${branch_name}"
 
     local ws_id wt_id

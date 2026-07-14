@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
-CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-. "$CURRENT_DIR/_common.sh"
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/_common.sh"
 
 function get_agent_counts() {
     _herdr agent list |
@@ -11,7 +10,7 @@ function get_agent_counts() {
             (.blocked // 0)' | xargs
 }
 
-function render_herdr_status() {
+function render_status_bar() {
     local -r idle_foreground="$1" working_foreground="$2" blocked_foreground="$3"
 
     local idle_count working_count blocked_count
@@ -25,4 +24,4 @@ function render_herdr_status() {
     echo "$idle$working$blocked"
 }
 
-render_herdr_status "$@"
+render_status_bar "$@"
