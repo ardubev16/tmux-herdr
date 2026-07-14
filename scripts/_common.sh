@@ -3,10 +3,11 @@
 set -euo pipefail
 shopt -s inherit_errexit
 
+HERDR_SESSION=tmux-herdr
 CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 function _herdr_interactive() {
-    HERDR_SESSION=tmux-herdr \
+    HERDR_SESSION="$HERDR_SESSION" \
         HERDR_CONFIG_PATH="$CURRENT_DIR/../herdr/config.toml" \
         herdr "$@"
 }
@@ -18,6 +19,24 @@ function _herdr() {
     # echo -e "$*\n$(echo "$out" | jq --color-output)\n" >&2
     [[ -z $out ]] && return 1
     echo "$out"
+}
+
+function wait_for_herdr_server() {
+    local -r max_retries=10
+
+    local session_running="" retries=0
+    while [[ $session_running != "true" && $retries -lt $max_retries ]]; do
+        session_running=$(_herdr session list --json |
+            jq --raw-output \
+                --arg name "$HERDR_SESSION" \
+                '.sessions | map(select(.name == $name).running) | .[]')
+        retries=$((retries + 1))
+        sleep 0.1
+    done
+
+    [[ $session_running != "true" ]] && return 1
+
+    return 0
 }
 
 function get_repo_metadata() {

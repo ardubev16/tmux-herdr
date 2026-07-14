@@ -39,7 +39,7 @@ function init_tmux_herdr() {
     tmux bind-key "$key_new_agent" run-shell "$CURRENT_DIR/main.sh new_agent \"$harness\" \"$split_direction\""
     tmux bind-key "$key_new_agent_branch" run-shell "$CURRENT_DIR/main.sh new_agent_branch \"$harness\" \"$split_direction\""
 
-    "$CURRENT_DIR/main.sh" init
+    "$CURRENT_DIR/scripts/init.sh"
 }
 
 function init_tmux_herdr_status() {

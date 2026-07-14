@@ -60,11 +60,6 @@ command="$1"
 shift
 
 case "$command" in
-init)
-    # TODO: Add command to start session if not already running.
-    # TODO: Check minimum supported version.
-    exit 0
-    ;;
 agent_dashboard)
     agent_dashboard "$@"
     ;;
