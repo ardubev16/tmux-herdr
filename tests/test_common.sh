@@ -6,12 +6,14 @@ set -uo pipefail
 fail=0
 
 function assert_contains() {
-    local -r desc="$1" haystack="$2" needle="$3"
-    if [[ "$haystack" == *"$needle"* ]]; then
+    local -r desc="$1" haystack="$2" needle="$3" expect="${4:-true}"
+    local matched=false
+    [[ "$haystack" == *"$needle"* ]] && matched=true
+    if [[ "$matched" == "$expect" ]]; then
         echo "PASS: $desc"
     else
         echo "FAIL: $desc"
-        echo "  expected to contain: $needle"
+        echo "  expected $([[ $expect == true ]] && echo to || echo NOT to) contain: $needle"
         echo "  got: $haystack"
         fail=1
     fi
@@ -59,5 +61,19 @@ assert_contains "soft-fail: uncaught call also gets generic trap line (accepted)
 
 out=$(run_case on '_herdr agent list')
 assert_contains "debug on: _herdr dumps raw I/O" "$out" "result"
+
+out=$(run_case off '
+    function herdr() {
+        if [[ "$1" == pane && "$2" == list ]]; then
+            echo "{\"result\":{\"panes\":[{\"pane_id\":\"p1\"},{\"pane_id\":\"p2\"}]}}"
+        elif [[ "$1" == pane && "$2" == close ]]; then
+            echo "{\"id\":\"cli:pane:close\",\"result\":{\"type\":\"ok\"}}"
+        fi
+    }
+    out=$(_cleanup_extra_panes ws1 p1)
+    echo "captured=[$out]"
+')
+assert_contains "_cleanup_extra_panes: pane close result does not leak to stdout" "$out" "cli:pane:close" false
+assert_contains "_cleanup_extra_panes: caller sees empty stdout" "$out" "captured=[]"
 
 exit "$fail"

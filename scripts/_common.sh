@@ -164,7 +164,7 @@ function _cleanup_extra_panes() {
             '.result.panes | map(select(.pane_id != $pane_id).pane_id) | .[]')
 
     for pane in "${extra_panes[@]}"; do
-        _herdr pane close "$pane"
+        _herdr pane close "$pane" >/dev/null
     done
 }
 
