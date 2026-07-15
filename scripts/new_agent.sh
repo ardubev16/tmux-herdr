@@ -4,4 +4,4 @@
 
 agent_name=$(new_agent "$1" "$2")
 [[ -n $debug_enabled ]] && echo "tmux-herdr: attaching to agent '$agent_name'" >&2
-_herdr_interactive agent attach "$agent_name"
+_herdr_interactive agent attach "$agent_name" || true
