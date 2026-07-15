@@ -1,11 +1,39 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+set -Eeuo pipefail
 shopt -s inherit_errexit
 
 declare -r HERDR_SESSION_NAME=tmux-herdr
 declare SCRIPTS_DIR
 SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+declare debug_enabled=""
+[[ "$(tmux show-option -gqv '@tmux_herdr_debug')" == on ]] && debug_enabled=1
+
+function _herdr_pause() {
+    [[ -t 0 ]] || return 0
+    read -rsn1 -p "Press any key to close this pane..." >&2
+    echo >&2
+}
+
+function die() {
+    echo "$1" >&2
+    _herdr_pause
+    exit 1
+}
+
+function _herdr_err_trap() {
+    local -r exit_code=$? line=$1 command=$2
+
+    if [[ -n $debug_enabled ]]; then
+        echo "tmux-herdr: error (exit $exit_code) at line $line: $command" >&2
+    else
+        echo "tmux-herdr: unexpected error (exit $exit_code). Set '@tmux_herdr_debug on' for details." >&2
+    fi
+    _herdr_pause
+    exit "$exit_code"
+}
+trap '_herdr_err_trap $LINENO "$BASH_COMMAND"' ERR
 
 function _herdr_interactive() {
     HERDR_SESSION="$HERDR_SESSION_NAME" \
@@ -17,7 +45,8 @@ function _herdr() {
     local out
     out=$(_herdr_interactive "$@")
 
-    # echo -e "$*\n$(echo "$out" | jq --color-output)\n" >&2
+    [[ -n $debug_enabled ]] && echo -e "$*\n$(echo "$out" | jq --color-output)\n" >&2
+
     [[ -z $out ]] && return 1
     echo "$out"
 }

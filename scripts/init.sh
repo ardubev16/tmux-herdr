@@ -12,8 +12,7 @@ function check_minimum_herdr_version() {
     herdr_version=$(_herdr --version | awk '{print $2}')
 
     if version_lt "$herdr_version" "$MINIMUM_HERDR_VERSION"; then
-        echo "Herdr version $herdr_version is too old. Minimum supported version: $MINIMUM_HERDR_VERSION"
-        exit 1
+        die "Herdr version $herdr_version is too old. Minimum supported version: $MINIMUM_HERDR_VERSION"
     fi
 }
 

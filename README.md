@@ -89,6 +89,9 @@ set -g @tmux_herdr_status_blocked_foreground 'red'
 # shell pane is available to reuse ('h' for horizontal, 'v' for vertical)
 set -g @tmux_herdr_split_direction 'h'
 
+# Debug mode: when enabled, prints verbose debug details to stderr.
+set -g @tmux_herdr_debug 'off'
+
 # Key that opens the herdr dashboard
 set -g @tmux_herdr_key_dashboard 'h'
 

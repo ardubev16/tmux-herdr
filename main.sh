@@ -84,7 +84,7 @@ function new_agent_branch() {
 }
 
 if [[ $# -lt 1 ]]; then
-    exit 1
+    die "Usage: main.sh <command> [args...]"
 fi
 
 command="$1"
@@ -101,6 +101,6 @@ new_agent_branch)
     new_agent_branch "$@"
     ;;
 *)
-    exit 1
+    die "Unknown command: $command"
     ;;
 esac
