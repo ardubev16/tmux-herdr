@@ -56,8 +56,9 @@ function get_repo_metadata() {
 }
 
 function select_branch() {
+    local -r path="$1"
     local fzf_out fzf_exit=0
-    branches=$(git branch)
+    branches=$(git -C "$path" branch)
     fzf_out=$({
         grep '^\*' <<<"$branches"
         grep -v '^\*' <<<"$branches"

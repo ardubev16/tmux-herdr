@@ -68,10 +68,12 @@ function new_agent() {
 
 function new_agent_branch() {
     local -r harness="$1" split_direction="$2"
+
+    local -r current_path=$(tmux display-message -p '#{pane_current_path}')
     local -r tmpfile="$(mktemp)"
 
     local popup_exit=0
-    tmux display-popup -E "$SCRIPTS_DIR/select_branch.sh '$tmpfile'" || popup_exit=$?
+    tmux display-popup -E "$SCRIPTS_DIR/select_branch.sh '$current_path' '$tmpfile'" || popup_exit=$?
 
     local -r branch_name="$(<"$tmpfile")"
     rm -f "$tmpfile"
