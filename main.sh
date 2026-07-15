@@ -7,18 +7,7 @@ set -euo pipefail
 declare -r agent_pane_option='@herdr_agent_name'
 
 function agent_dashboard() {
-    # TODO: implement toggle
     tmux display-popup -w 90% -h 90% -E "$SCRIPTS_DIR/agent_dashboard.sh"
-}
-
-function attach_agent() {
-    # TODO: check if agent is running for this repo
-    # TODO: handle graceful panel close (leader+x ??)
-    # TODO: handle different cases:
-    #   - horizontal split
-    #   - vertical split
-    #   - use focused pane
-    tmux split-window -h "$SCRIPTS_DIR/attach_agent.sh"
 }
 
 function shell_basename() {
@@ -102,9 +91,6 @@ shift
 case "$command" in
 agent_dashboard)
     agent_dashboard "$@"
-    ;;
-attach_agent)
-    attach_agent "$@"
     ;;
 new_agent)
     new_agent "$@"
