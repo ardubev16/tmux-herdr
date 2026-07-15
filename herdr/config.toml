@@ -4,4 +4,4 @@ onboarding = false
 name = "terminal"
 
 [keys]
-detach = ["ctrl+c", "ctrl+d"]
+detach = ["ctrl+c"]
