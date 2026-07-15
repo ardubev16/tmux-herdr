@@ -32,10 +32,11 @@ All keybindings are triggered with your tmux prefix:
 
 | Key          | Action                                                                                                                                                                              |
 | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `prefix + h` | Open the herdr dashboard in a popup                                                                                                                                                |
-| `prefix + a` | Attach to the agent for the current repo in a new pane (prompts with fzf if multiple agents match)                                                                                |
-| `prefix + N` | Start a new agent for the branch currently checked out, create/reuse its workspace and worktree, and attach to it (reusing a shell pane if one is available, otherwise splitting) |
+| `prefix + H` | Open the herdr dashboard in a popup (close it with `Ctrl+c`)                                                                                                                       |
+| `prefix + N` | Start/reuse an agent for the branch currently checked out, create/reuse its workspace and worktree, and attach to it (reusing a shell pane if one is available, otherwise splitting) |
 | `prefix + B` | Same as above, but first pick a branch with fzf in a popup                                                                                                                         |
+
+Attaching to an agent (`prefix + N`/`prefix + B`) drops you into its `herdr agent attach` session; press `Ctrl+d` to close the agent.
 
 ## Installation
 
@@ -85,6 +86,9 @@ set -g @tmux_herdr_status_working_foreground 'yellow'
 # Foreground color for blocked agents
 set -g @tmux_herdr_status_blocked_foreground 'red'
 
+# Harness used to start new agents
+set -g @tmux_herdr_harness 'claude'
+
 # Direction of the split used to place a new agent's pane, when no existing
 # shell pane is available to reuse ('h' for horizontal, 'v' for vertical)
 set -g @tmux_herdr_split_direction 'h'
@@ -93,10 +97,7 @@ set -g @tmux_herdr_split_direction 'h'
 set -g @tmux_herdr_debug 'off'
 
 # Key that opens the herdr dashboard
-set -g @tmux_herdr_key_dashboard 'h'
-
-# Key that attaches to the agent for the current repo
-set -g @tmux_herdr_key_attach 'a'
+set -g @tmux_herdr_key_dashboard 'H'
 
 # Key that starts a new agent for the branch currently checked out
 set -g @tmux_herdr_key_new_agent 'N'
