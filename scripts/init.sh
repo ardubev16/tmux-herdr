@@ -26,7 +26,7 @@ function init_herdr_session() {
     # from the weird TUI that tries to spawn. Useful for debugging.
     [[ $- == *i* ]] && reset
 
-    wait_for_herdr_server
+    wait_for_server
     kill -9 "$pid"
 
     _herdr server reload-config

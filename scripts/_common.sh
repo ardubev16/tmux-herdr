@@ -22,7 +22,7 @@ function _herdr() {
     echo "$out"
 }
 
-function wait_for_herdr_server() {
+function wait_for_server() {
     local -r max_retries=10
 
     local session_running="" retries=0
@@ -80,7 +80,7 @@ function select_branch() {
     echo "$branch_name"
 }
 
-function create_workspace() {
+function _create_workspace() {
     local -r name="$1" path="$2"
 
     local ws_id
@@ -97,7 +97,7 @@ function create_workspace() {
     echo "$ws_id"
 }
 
-function create_worktree() {
+function _create_worktree() {
     local -r ws_id="$1" branch="$2" path="$3"
 
     local wt_id
@@ -125,7 +125,7 @@ function create_worktree() {
     echo "$wt_id"
 }
 
-function cleanup_extra_panes() {
+function _cleanup_extra_panes() {
     local -r ws_id="$1" pane_id="$2"
 
     local -a extra_panes
@@ -139,7 +139,7 @@ function cleanup_extra_panes() {
     done
 }
 
-function start_agent() {
+function _start_agent() {
     local -r ws_id="$1" name="$2" repo_path="$3" harness="$4"
 
     local pane_id
@@ -161,22 +161,7 @@ function start_agent() {
         pane_id=$(_herdr agent start "$name" --workspace "$ws_id" --cwd "$cwd" -- "$harness" |
             jq --raw-output '.result.agent.pane_id')
 
-        cleanup_extra_panes "$ws_id" "$pane_id"
-    fi
-}
-
-function select_agent() {
-    local -r name="$1"
-
-    local agents
-    mapfile -t agents < <(_herdr agent list | jq --raw-output '.result.agents | map(.name) | .[]' | grep "$name")
-
-    [[ ${#agents[@]} == 0 ]] && return 1
-
-    if [[ ${#agents[@]} == 1 ]]; then
-        echo "${agents[0]}"
-    else
-        printf "%s\n" "${agents[@]}" | fzf
+        _cleanup_extra_panes "$ws_id" "$pane_id"
     fi
 }
 
@@ -195,10 +180,10 @@ function new_agent() {
     local -r agent_name="${workspace_name}::${branch_name}"
 
     local ws_id wt_id
-    ws_id=$(create_workspace "$workspace_name" "$repo_full_path")
-    wt_id=$(create_worktree "$ws_id" "$branch_name" "$repo_full_path")
+    ws_id=$(_create_workspace "$workspace_name" "$repo_full_path")
+    wt_id=$(_create_worktree "$ws_id" "$branch_name" "$repo_full_path")
 
-    start_agent "$wt_id" "$agent_name" "$repo_full_path" "$harness"
+    _start_agent "$wt_id" "$agent_name" "$repo_full_path" "$harness"
 
     _herdr agent focus "$agent_name" >/dev/null
 

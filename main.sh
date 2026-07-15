@@ -6,15 +6,11 @@ set -euo pipefail
 
 declare -r agent_pane_option='@herdr_agent_name'
 
-function agent_dashboard() {
-    tmux display-popup -w 90% -h 90% -E "$SCRIPTS_DIR/agent_dashboard.sh"
-}
-
-function shell_basename() {
+function _shell_basename() {
     basename "$(tmux show-option -gqv default-shell)"
 }
 
-function find_pane_by() {
+function _find_pane_by() {
     local -r format="$1" value="$2"
     tmux list-panes -F "#{pane_id} #{$format}" |
         awk -v val="$value" '$2 == val { print $1; exit }'
@@ -36,19 +32,19 @@ function _spawn_new_agent() {
     local -r prefix="$(_repo_prefix "$pane_path")"
     local -r agent_name="${prefix}::${branch_name}"
 
-    local -r existing_pane="$(find_pane_by "$agent_pane_option" "$agent_name")"
+    local -r existing_pane="$(_find_pane_by "$agent_pane_option" "$agent_name")"
     if [[ -n "$existing_pane" ]]; then
         tmux select-pane -t "$existing_pane"
         return 0
     fi
 
-    local -r default_shell="$(shell_basename)"
+    local -r default_shell="$(_shell_basename)"
 
     local target_pane
     if [[ "$focused_command" == "$default_shell" ]]; then
         target_pane="$focused_pane"
     else
-        target_pane=$(find_pane_by "pane_current_command" "$default_shell")
+        target_pane=$(_find_pane_by "pane_current_command" "$default_shell")
     fi
 
     if [[ -n "$target_pane" ]]; then
@@ -58,6 +54,10 @@ function _spawn_new_agent() {
         target_pane="$(tmux split-window -P -F '#{pane_id}' -c "$pane_path" "-$split_direction" "$SCRIPTS_DIR/new_agent.sh" "$harness" "$branch_name")"
     fi
     tmux set-option -p -t "$target_pane" "$agent_pane_option" "$agent_name"
+}
+
+function agent_dashboard() {
+    tmux display-popup -w 90% -h 90% -E "$SCRIPTS_DIR/agent_dashboard.sh"
 }
 
 function new_agent() {
