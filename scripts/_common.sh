@@ -115,8 +115,8 @@ function _create_workspace() {
     local ws_id
     ws_id=$(_herdr workspace list |
         jq --raw-output \
-            --arg label "$name" \
-            '.result.workspaces | map(select(.label == $label).workspace_id)[0]')
+            --arg ws_label "$name" \
+            '.result.workspaces | map(select(.label == $ws_label).workspace_id)[0]')
 
     if [[ $ws_id == "null" ]]; then
         ws_id=$(_herdr workspace create --label "$name" --cwd "$path" |
