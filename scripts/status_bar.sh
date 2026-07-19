@@ -17,9 +17,9 @@ function render_status_bar() {
     read -r idle_count working_count blocked_count <<<"$(get_agent_counts)"
 
     local -r \
-        idle="#[fg=$idle_foreground] ⦿ $idle_count " \
+        idle="#[fg=$idle_foreground] ○ $idle_count " \
         working="#[fg=$working_foreground] ⦿ $working_count " \
-        blocked="#[fg=$blocked_foreground] ⦿ $blocked_count "
+        blocked="#[fg=$blocked_foreground] ● $blocked_count "
 
     echo "$idle$working$blocked"
 }
